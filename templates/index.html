@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Code Review Assistant</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+        textarea, pre { width: 100%; min-height: 200px; box-sizing: border-box; }
+        pre { background-color: #f4f4f4; padding: 10px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Code Review Assistant 🤖</h1>
+    <form id="upload-form">
+        <p>Select a code file to review:</p>
+        <input type="file" id="file-input" required>
+        <button type="submit">Get Review</button>
+    </form>
+    
+    <h2>Review Report:</h2>
+    <pre id="report-output">Your report will appear here...</pre>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('file-input');
+            const reportOutput = document.getElementById('report-output');
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            reportOutput.textContent = 'Generating review, please wait...';
+            
+            try {
+                const response = await fetch('/review-code', {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    reportOutput.textContent = result.review_report;
+                } else {
+                    reportOutput.textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                reportOutput.textContent = `An unexpected error occurred: ${error}`;
+            }
+        });
+    </script>
+</body>
+</html>
